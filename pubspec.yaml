@@ -1,0 +1,29 @@
+name: alpensw
+description: "アルペン競技用のストップウォッチ"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0-279.0.dev <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons:
+  flutter_riverpod:
+  firebase_core:
+  firebase_auth:
+  cloud_firestore:
+  hive: 
+  hive_flutter:
+  audioplayers:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints:
+
+flutter:
+  uses-material-design: true
