@@ -40,7 +40,7 @@ class StopwatchPage extends ConsumerWidget {
               title: const Text(
                 'ALPENストップウォッチ',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -110,7 +110,7 @@ class StopwatchPage extends ConsumerWidget {
                                           .getFormattedStartDateTime() ??
                                       "-",
                                   style: const TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10,
                                   ),
                                 ),
                                 Text(
@@ -118,7 +118,7 @@ class StopwatchPage extends ConsumerWidget {
                                           .getFormattedStopDateTime() ??
                                       "-",
                                   style: const TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10,
                                   ),
                                 ),
                               ],
