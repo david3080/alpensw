@@ -93,7 +93,7 @@ class StopwatchPage extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Expanded(
-                            flex: 2,
+                            flex: 4,
                             child: Text(
                               formatTime(
                                 timerType == TimerType.stopped
@@ -106,7 +106,7 @@ class StopwatchPage extends ConsumerWidget {
                             ),
                           ),
                           Expanded(
-                            flex: 1,
+                            flex: 3,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
@@ -115,7 +115,7 @@ class StopwatchPage extends ConsumerWidget {
                                           .getFormattedStartDateTime() ??
                                       "-",
                                   style: const TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 9,
                                   ),
                                 ),
                                 Text(
@@ -123,7 +123,7 @@ class StopwatchPage extends ConsumerWidget {
                                           .getFormattedStopDateTime() ??
                                       "-",
                                   style: const TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 9,
                                   ),
                                 ),
                               ],
