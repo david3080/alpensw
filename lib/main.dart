@@ -7,7 +7,6 @@ import 'firebaseholder.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-
   runApp(
     ProviderScope(
       child: MyApp(),

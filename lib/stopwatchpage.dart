@@ -92,16 +92,21 @@ class StopwatchPage extends ConsumerWidget {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Flexible(
+                          Expanded(
+                            flex: 2,
                             child: Text(
                               formatTime(
-                                  stopwatchController.getTimerMilliseconds()),
+                                timerType == TimerType.stopped
+                                    ? stopwatchController.getTimerMilliseconds()
+                                    : stopwatchController.milliseconds,
+                              ),
                               style: const TextStyle(
                                 fontSize: 15,
                               ),
                             ),
                           ),
                           Expanded(
+                            flex: 1,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
