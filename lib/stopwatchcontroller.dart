@@ -61,6 +61,13 @@ class StopwatchController {
 
   int get milliseconds => _stopwatch.elapsedMilliseconds;
 
+  int getTimerMilliseconds() {
+    if (startDateTime != null && stopDateTime != null) {
+      return stopDateTime!.difference(startDateTime!).inMilliseconds;
+    }
+    return 0;
+  }
+
   String? getFormattedStartDateTime() {
     if (startDateTime != null) {
       return _formatDateTime(startDateTime!);

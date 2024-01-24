@@ -52,7 +52,7 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
         stopwatch.startDateTime = data?['startDateTime']?.toDate();
         stopwatch.stopDateTime = data?['stopDateTime']?.toDate();
 
-        // Firestoreから取得したstartDateTimeを基にStopwatchをリセット
+        // Firestoreから取得したstartDateTimeを基にStopwatchを開始
         if (stopwatch.startDateTime != null &&
             stopwatch.stopwatch.isRunning == false) {
           stopwatch.stopwatch.elapsedMilliseconds = DateTime.now()

@@ -85,7 +85,7 @@ class StopwatchPage extends ConsumerWidget {
                       leading: Text(
                         stopwatchController.getBibNumber().toString(),
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -94,9 +94,10 @@ class StopwatchPage extends ConsumerWidget {
                         children: <Widget>[
                           Flexible(
                             child: Text(
-                              formatTime(stopwatchController.milliseconds),
+                              formatTime(
+                                  stopwatchController.getTimerMilliseconds()),
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                               ),
                             ),
                           ),
@@ -170,7 +171,7 @@ class StopwatchPage extends ConsumerWidget {
     final String formattedMinutes = minutes.toString().padLeft(2, '0');
     final String formattedSeconds = (seconds % 60).toString().padLeft(2, '0');
     final String formattedMilliseconds =
-        (hundreds % 100).toString().padLeft(2, '0');
+        (milliseconds % 1000).toString().padLeft(3, '0');
 
     return "$formattedMinutes:$formattedSeconds:$formattedMilliseconds";
   }
