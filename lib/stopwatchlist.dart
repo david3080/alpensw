@@ -3,23 +3,25 @@ import 'stopwatchmodel.dart';
 import 'usermodel.dart';
 
 final stopwatchListProvider =
-    StateNotifierProvider.family<StopwatcheListNotifier, StopwatcheList, int>(
-        (ref, count) {
-  return StopwatcheListNotifier(ref.container, count);
+    StateNotifierProvider.family<StopwatcheListNotifier, StopwatcheList, Compe>(
+        (ref, compe) {
+  return StopwatcheListNotifier(ref.container, compe);
 });
 
 class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
   final ProviderContainer ref;
+  final Compe compe;
   final UserModelState user;
-  StopwatcheListNotifier(this.ref, int count)
+  StopwatcheListNotifier(this.ref, this.compe)
       : user = ref.read(userModelProvider.notifier).state,
         super(StopwatcheList()) {
     state = StopwatcheList(
       stopwatches: List.generate(
-        count,
+        compe.num,
         (index) => StopwatchModel(
           index + 1,
           user,
+          compe,
           _updateState,
         ),
       ),
@@ -54,38 +56,54 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
 
   void syncTimerWithFirestore(int index) {
     final stopwatch = state.stopwatches[index];
-    stopwatch.firestore
+    final docRef = stopwatch.firestore
         .collection('users')
         .doc(user.email)
         .collection('compes')
-        .doc(user.compe?.id)
+        .doc(compe.id)
         .collection('timers')
-        .doc(stopwatch.bibNumber.toString())
-        .snapshots()
-        .listen((snapshot) {
+        .doc(stopwatch.bibNumber.toString());
+
+    docRef.get().then((docSnapshot) {
+      if (docSnapshot.exists) {
+        // 既存のデータを使用
+        final data = docSnapshot.data();
+        stopwatch.startDateTime = data?['startDateTime']?.toDate();
+        stopwatch.stopDateTime = data?['stopDateTime']?.toDate();
+        _updateState();
+      } else {
+        // 新たにコレクションを作成
+        docRef.set({
+          'startDateTime': null,
+          'stopDateTime': null,
+        });
+      }
+    });
+
+    docRef.snapshots().listen((snapshot) {
       if (snapshot.exists) {
         final data = snapshot.data();
         stopwatch.startDateTime = data?['startDateTime']?.toDate();
         stopwatch.stopDateTime = data?['stopDateTime']?.toDate();
-
-        // Firestoreから取得したstartDateTimeを基にStopwatchを開始
-        if (stopwatch.startDateTime != null &&
-            stopwatch.stopwatch.isRunning == false) {
-          stopwatch.stopwatch.elapsedMilliseconds = DateTime.now()
-              .difference(stopwatch.startDateTime!)
-              .inMilliseconds;
-          stopwatch.stopwatch.start();
-        }
-
-        // Firestoreから取得したstopDateTimeを基にStopwatchを停止
-        if (stopwatch.stopDateTime != null &&
-            stopwatch.stopwatch.isRunning == true) {
-          stopwatch.stopwatch.stop();
-        }
-
         _updateState();
       }
     });
+  }
+
+  Future<void> checkAndSyncTimerWithFirestore(int index) async {
+    final stopwatch = state.stopwatches[index];
+    final docRef = stopwatch.firestore
+        .collection('users')
+        .doc(user.email)
+        .collection('compes')
+        .doc(compe.id)
+        .collection('timers')
+        .doc(stopwatch.bibNumber.toString());
+
+    final docSnapshot = await docRef.get();
+    if (!docSnapshot.exists) {
+      syncTimerWithFirestore(index);
+    }
   }
 }
 

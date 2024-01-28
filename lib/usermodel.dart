@@ -10,14 +10,14 @@ class UserModelState {
   final String email;
   final bool loggedIn;
   final List<Compe>? compes;
-  Compe? compe;
+//  Compe? compe;
 
   UserModelState({
     required this.name,
     required this.email,
     required this.loggedIn,
     this.compes,
-    this.compe,
+//    this.compe,
   });
 }
 
@@ -36,7 +36,7 @@ class UserModel extends StateNotifier<UserModelState> {
 
   String get name => state.name;
   String get email => state.email;
-  Compe? get compe => state.compe;
+//  Compe? get compe => state.compe;
   List<Compe>? get compes => state.compes;
 
   set compe(Compe? compe) {
@@ -45,7 +45,7 @@ class UserModel extends StateNotifier<UserModelState> {
       email: state.email,
       loggedIn: state.loggedIn,
       compes: state.compes,
-      compe: compe,
+//      compe: compe,
     );
   }
 

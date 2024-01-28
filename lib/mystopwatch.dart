@@ -24,6 +24,12 @@ class MyStopwatch {
         Timer.periodic(const Duration(milliseconds: 100), (Timer t) => _tick());
   }
 
+  void startFrom(DateTime startDateTime) {
+    _start = startDateTime;
+    _timer =
+        Timer.periodic(const Duration(milliseconds: 100), (Timer t) => _tick());
+  }
+
   void stop() {
     if (_start != null) {
       _elapsed += DateTime.now().difference(_start!) + _offset;

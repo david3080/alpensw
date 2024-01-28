@@ -22,8 +22,16 @@ class StopwatchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stopwatchList = ref.watch(stopwatchListProvider(compe.num).notifier);
+    final stopwatchList = ref.watch(stopwatchListProvider(compe).notifier);
     final timerType = ref.watch(naviProvider);
+
+    // Firestoreにcompe.num分のtimersコレクションが存在しない場合のみ作成
+    for (int i = 0; i < compe.num; i++) {
+      stopwatchList.checkAndSyncTimerWithFirestore(i);
+      // Firestoreとの同期を行う
+      stopwatchList.stopwatches[i].syncWithFirestore();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(

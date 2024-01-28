@@ -10,15 +10,14 @@ class StopwatchModel {
   DateTime? stopDateTime;
   int bibNumber;
   UserModelState user;
+  Compe compe;
 
-  // Firestoreインスタンスを取得
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // ゲッターを作成
   MyStopwatch get stopwatch => _stopwatch;
   FirebaseFirestore get firestore => _firestore;
 
-  StopwatchModel(this.bibNumber, this.user, VoidCallback onTick)
+  StopwatchModel(this.bibNumber, this.user, this.compe, VoidCallback onTick)
       : _stopwatch = MyStopwatch(onTick: onTick);
 
   TimerType get timerType {
@@ -37,13 +36,34 @@ class StopwatchModel {
         .collection('users')
         .doc(user.email)
         .collection('compes')
-        .doc(user.compe?.id)
+        .doc(compe.id)
         .collection('timers')
         .doc(bibNumber.toString())
         .set({
       'startDateTime': startDateTime,
       'stopDateTime': stopDateTime,
     }, SetOptions(merge: true));
+  }
+
+  Future<void> syncWithFirestore() async {
+    DocumentSnapshot docSnapshot = await _firestore
+        .collection('users')
+        .doc(user.email)
+        .collection('compes')
+        .doc(compe.id)
+        .collection('timers')
+        .doc(bibNumber.toString())
+        .get();
+
+    if (docSnapshot.exists) {
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+      if (data.containsKey('startDateTime')) {
+        startDateTime = (data['startDateTime'] as Timestamp).toDate();
+        if (timerType == TimerType.running) {
+          _stopwatch.startFrom(startDateTime!);
+        }
+      }
+    }
   }
 
   void startTimer() {

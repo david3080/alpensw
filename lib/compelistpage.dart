@@ -92,10 +92,12 @@ class _CompeListPageState extends ConsumerState<CompeListPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('測定名: ${compe.name}'),
                     Text('測定メモ: ${compe.memo}'),
+                    Text('測定数: ${compe.num}'),
                   ],
                 ),
               ),
