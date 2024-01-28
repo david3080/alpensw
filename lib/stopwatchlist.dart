@@ -1,23 +1,33 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'stopwatchcontroller.dart';
+import 'stopwatchmodel.dart';
+import 'usermodel.dart';
 
-final stopwatcheListProvider =
-    StateNotifierProvider<StopwatcheListNotifier, StopwatcheList>((ref) {
-  return StopwatcheListNotifier();
+final stopwatchListProvider =
+    StateNotifierProvider.family<StopwatcheListNotifier, StopwatcheList, int>(
+        (ref, count) {
+  return StopwatcheListNotifier(ref.container, count);
 });
 
 class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
-  StopwatcheListNotifier() : super(StopwatcheList()) {
+  final ProviderContainer ref;
+  StopwatcheListNotifier(this.ref, int count) : super(StopwatcheList()) {
+    final user = ref.read(userModelProvider.notifier).state;
     state = StopwatcheList(
       stopwatches: List.generate(
-        5,
-        (index) => StopwatchController(index + 1, _updateState),
+        count,
+        (index) => StopwatchModel(
+          index + 1,
+          user,
+          _updateState,
+        ),
       ),
     );
     for (var i = 0; i < state.stopwatches.length; i++) {
       syncTimerWithFirestore(i);
     }
   }
+
+  List<StopwatchModel> get stopwatches => state.stopwatches;
 
   void startTimer(int index) {
     state.stopwatches[index].startTimer();
@@ -36,7 +46,7 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
 
   void _updateState() {
     state = StopwatcheList(
-      stopwatches: List<StopwatchController>.from(state.stopwatches),
+      stopwatches: List<StopwatchModel>.from(state.stopwatches),
     );
   }
 
@@ -74,6 +84,6 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
 }
 
 class StopwatcheList {
-  final List<StopwatchController> stopwatches;
+  final List<StopwatchModel> stopwatches;
   StopwatcheList({this.stopwatches = const []});
 }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'stopwatchlist.dart';
-import 'stopwatchcontroller.dart';
-import 'fbsettingdialog.dart';
-import 'firebaseholder.dart';
+import 'stopwatchmodel.dart';
+import 'usermodel.dart';
 
 final naviProvider = StateNotifierProvider<NaviNotifier, TimerType>((ref) {
   return NaviNotifier();
@@ -19,152 +17,128 @@ class NaviNotifier extends StateNotifier<TimerType> {
 }
 
 class StopwatchPage extends ConsumerWidget {
-  final Future<FirebaseApp> _initialization;
-  StopwatchPage() : _initialization = initializeFirebase();
-  static Future<FirebaseApp> initializeFirebase() async {
-    FirebaseOptions options = await FirebaseHolder().loadFirebaseOptions();
-    return await Firebase.initializeApp(options: options);
-  }
+  final Compe compe;
+  StopwatchPage({required this.compe});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          // Firebaseの初期化が完了したら、通常のビルドを行う
-          final stopwatcheList = ref.watch(stopwatcheListProvider);
-          final timerType = ref.watch(naviProvider);
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                'ALPENストップウォッチ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              centerTitle: true,
-              leading: IconButton(
-                icon: const Icon(
-                  Icons.refresh,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  for (int i = 0; i < stopwatcheList.stopwatches.length; i++) {
-                    ref.read(stopwatcheListProvider.notifier).resetTimer(i);
-                  }
-                },
-              ),
-              actions: <Widget>[
-                IconButton(
-                  icon: const Icon(
-                    Icons.settings,
-                    color: Colors.white,
-                  ),
-                  onPressed: () async {
-                    await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return FBSettingsDialog();
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(width: 10.0),
-              ],
+    final stopwatchList = ref.watch(stopwatchListProvider(compe.num).notifier);
+    final timerType = ref.watch(naviProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "測定名: ${compe.name}",
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.refresh,
+              color: Colors.white,
             ),
-            body: ListView.builder(
-                itemCount: stopwatcheList.stopwatches.length,
-                itemBuilder: (context, index) {
-                  final stopwatchController = stopwatcheList.stopwatches[index];
-                  if (_shouldShowStopwatch(
-                      stopwatchController.timerType, timerType)) {
-                    return ListTile(
-                      leading: Text(
-                        stopwatchController.getBibNumber().toString(),
+            onPressed: () {
+              for (int i = 0; i < stopwatchList.stopwatches.length; i++) {
+                stopwatchList.resetTimer(i);
+              }
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+          itemCount: stopwatchList.stopwatches.length,
+          itemBuilder: (context, index) {
+            final stopwatchController = stopwatchList.stopwatches[index];
+            if (_shouldShowStopwatch(
+                stopwatchController.timerType, timerType)) {
+              return ListTile(
+                leading: Text(
+                  stopwatchController.getBibNumber().toString(),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        formatTime(
+                          timerType == TimerType.stopped
+                              ? stopwatchController.getTimerMilliseconds()
+                              : stopwatchController.milliseconds,
+                        ),
                         style: const TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          Expanded(
-                            flex: 4,
-                            child: Text(
-                              formatTime(
-                                timerType == TimerType.stopped
-                                    ? stopwatchController.getTimerMilliseconds()
-                                    : stopwatchController.milliseconds,
-                              ),
-                              style: const TextStyle(
-                                fontSize: 15,
-                              ),
+                          Text(
+                            stopwatchController.getFormattedStartDateTime() ??
+                                "-",
+                            style: const TextStyle(
+                              fontSize: 9,
                             ),
                           ),
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                Text(
-                                  stopwatchController
-                                          .getFormattedStartDateTime() ??
-                                      "-",
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                  ),
-                                ),
-                                Text(
-                                  stopwatchController
-                                          .getFormattedStopDateTime() ??
-                                      "-",
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            stopwatchController.getFormattedStopDateTime() ??
+                                "-",
+                            style: const TextStyle(
+                              fontSize: 9,
                             ),
                           ),
                         ],
                       ),
-                      trailing: _buildTrailingIcon(
-                          stopwatchController.timerType, index, ref),
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                }),
-            bottomNavigationBar: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.play_arrow),
-                  label: 'Start',
+                    ),
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.stop),
-                  label: 'Stop',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.flag),
-                  label: 'Finish',
-                ),
-              ],
-              currentIndex: TimerType.values.indexOf(timerType),
-              onTap: (index) {
-                ref
-                    .read(naviProvider.notifier)
-                    .setTimerType(TimerType.values[index]);
-              },
-            ),
-          );
-        } else {
-          return const CircularProgressIndicator();
-        }
-      },
+                trailing: _buildTrailingIcon(
+                    stopwatchController.timerType, index, stopwatchList),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          }),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.play_arrow),
+            label: 'Start',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.stop),
+            label: 'Goal',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.flag),
+            label: 'Results',
+          ),
+        ],
+        currentIndex: TimerType.values.indexOf(timerType),
+        onTap: (index) {
+          ref.read(naviProvider.notifier).setTimerType(TimerType.values[index]);
+        },
+      ),
     );
   }
 
@@ -194,20 +168,18 @@ class StopwatchPage extends ConsumerWidget {
     }
   }
 
-  Widget? _buildTrailingIcon(
-      TimerType stopwatchType, int index, WidgetRef ref) {
+  Widget? _buildTrailingIcon(TimerType stopwatchType, int index,
+      StopwatcheListNotifier stopwatchList) {
     switch (stopwatchType) {
       case TimerType.initial:
         return IconButton(
           icon: const Icon(Icons.play_arrow),
-          onPressed: () =>
-              ref.read(stopwatcheListProvider.notifier).startTimer(index),
+          onPressed: () => stopwatchList.startTimer(index),
         );
       case TimerType.running:
         return IconButton(
           icon: const Icon(Icons.stop),
-          onPressed: () =>
-              ref.read(stopwatcheListProvider.notifier).stopTimer(index),
+          onPressed: () => stopwatchList.stopTimer(index),
         );
       case TimerType.stopped:
         return null;

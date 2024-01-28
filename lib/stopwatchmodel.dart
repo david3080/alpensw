@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'usermodel.dart';
 import 'mystopwatch.dart';
 
-class StopwatchController {
+class StopwatchModel {
   final MyStopwatch _stopwatch;
   DateTime? startDateTime;
   DateTime? stopDateTime;
   int bibNumber;
+  UserModelState user;
 
   // Firestoreインスタンスを取得
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -16,7 +18,7 @@ class StopwatchController {
   MyStopwatch get stopwatch => _stopwatch;
   FirebaseFirestore get firestore => _firestore;
 
-  StopwatchController(this.bibNumber, VoidCallback onTick)
+  StopwatchModel(this.bibNumber, this.user, VoidCallback onTick)
       : _stopwatch = MyStopwatch(onTick: onTick);
 
   TimerType get timerType {
@@ -31,7 +33,14 @@ class StopwatchController {
 
   // Firestore上のタイマーをセットする
   Future<void> setDateTimeOnFirestore() async {
-    await _firestore.collection('timers').doc(bibNumber.toString()).set({
+    await _firestore
+        .collection('users')
+        .doc(user.email)
+        .collection('compes')
+        .doc(user.compe?.id)
+        .collection('timers')
+        .doc(bibNumber.toString())
+        .set({
       'startDateTime': startDateTime,
       'stopDateTime': stopDateTime,
     }, SetOptions(merge: true));
