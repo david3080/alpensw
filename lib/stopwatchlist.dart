@@ -10,8 +10,10 @@ final stopwatchListProvider =
 
 class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
   final ProviderContainer ref;
-  StopwatcheListNotifier(this.ref, int count) : super(StopwatcheList()) {
-    final user = ref.read(userModelProvider.notifier).state;
+  final UserModelState user;
+  StopwatcheListNotifier(this.ref, int count)
+      : user = ref.read(userModelProvider.notifier).state,
+        super(StopwatcheList()) {
     state = StopwatcheList(
       stopwatches: List.generate(
         count,
@@ -53,6 +55,10 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
   void syncTimerWithFirestore(int index) {
     final stopwatch = state.stopwatches[index];
     stopwatch.firestore
+        .collection('users')
+        .doc(user.email)
+        .collection('compes')
+        .doc(user.compe?.id)
         .collection('timers')
         .doc(stopwatch.bibNumber.toString())
         .snapshots()
