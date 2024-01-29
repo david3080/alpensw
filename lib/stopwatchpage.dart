@@ -22,7 +22,6 @@ class StopwatchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userModelProvider.notifier);
     final stopwatchList = ref.watch(stopwatchListProvider(compe).notifier);
     final timerType = ref.watch(naviProvider);
 
