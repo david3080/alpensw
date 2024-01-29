@@ -16,6 +16,86 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   String _emailError = ''; // Emailのエラーメッセージ
   String _passwordError = ''; // パスワードのエラーメッセージ
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/icon.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      hintText: 'Eメール',
+                      border: const OutlineInputBorder(),
+                      errorText: _emailError.isEmpty ? null : _emailError,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      hintText: 'パスワード',
+                      border: const OutlineInputBorder(),
+                      errorText: _passwordError.isEmpty ? null : _passwordError,
+                    ),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5), // 角度を調整
+                            ),
+                          ),
+                          onPressed: _signIn,
+                          child: const Text('ログイン'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5), // 角度を調整
+                            ),
+                          ),
+                          onPressed: _signInAnonymously,
+                          child: const Text('匿名ﾛｸﾞｲﾝ'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _signIn() async {
     // 入力チェック
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -60,75 +140,5 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         _passwordError = '匿名ログインに失敗しました。';
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Image.asset('assets/images/icon.png',
-                fit: BoxFit.cover), // アイコンを表示
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      errorText: _emailError.isEmpty
-                          ? null
-                          : _emailError, // エラーメッセージを設定
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      errorText: _passwordError.isEmpty
-                          ? null
-                          : _passwordError, // エラーメッセージを設定
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 50),
-                          ),
-                          onPressed: _signIn,
-                          child: const Text('ログイン'),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 50),
-                          ),
-                          onPressed: _signInAnonymously,
-                          child: const Text('匿名ログイン'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

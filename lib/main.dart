@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'compelistpage.dart';
 import 'firebaseholder.dart';
 import 'usermodel.dart';
@@ -9,8 +10,12 @@ import 'loginpage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: FirebaseHolder().loadFirebaseOptions());
-  await Firebase.initializeApp();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: FirebaseHolder().loadFirebaseOptions());
+  } else {
+    await Firebase.initializeApp();
+  }
   runApp(
     ProviderScope(
       child: MyApp(),
