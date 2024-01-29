@@ -10,6 +10,7 @@ import 'loginpage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: FirebaseHolder().loadFirebaseOptions());
+  await Firebase.initializeApp();
   runApp(
     ProviderScope(
       child: MyApp(),
