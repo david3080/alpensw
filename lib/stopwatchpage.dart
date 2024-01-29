@@ -22,6 +22,7 @@ class StopwatchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userModelProvider.notifier);
     final stopwatchList = ref.watch(stopwatchListProvider(compe).notifier);
     final timerType = ref.watch(naviProvider);
 
@@ -53,6 +54,16 @@ class StopwatchPage extends ConsumerWidget {
           },
         ),
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              ref.read(userModelProvider.notifier).deleteCompe(compe.id);
+              Navigator.pop(context);
+            },
+          ),
           IconButton(
             icon: const Icon(
               Icons.refresh,

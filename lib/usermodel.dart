@@ -10,14 +10,12 @@ class UserModelState {
   final String email;
   final bool loggedIn;
   final List<Compe>? compes;
-//  Compe? compe;
 
   UserModelState({
     required this.name,
     required this.email,
     required this.loggedIn,
     this.compes,
-//    this.compe,
   });
 }
 
@@ -36,7 +34,6 @@ class UserModel extends StateNotifier<UserModelState> {
 
   String get name => state.name;
   String get email => state.email;
-//  Compe? get compe => state.compe;
   List<Compe>? get compes => state.compes;
 
   set compe(Compe? compe) {
@@ -45,7 +42,6 @@ class UserModel extends StateNotifier<UserModelState> {
       email: state.email,
       loggedIn: state.loggedIn,
       compes: state.compes,
-//      compe: compe,
     );
   }
 
@@ -136,8 +132,16 @@ class UserModel extends StateNotifier<UserModelState> {
 
   Future<void> deleteCompe(String compeId) async {
     final userDoc = _firestore.collection('users').doc(state.email);
-    await userDoc.collection('compes').doc(compeId).delete();
-    final List<Compe> newCompes = List<Compe>.from(state.compes ?? []);
+    var compeDocRef = userDoc.collection('compes').doc(compeId);
+    var timersCollectionRef = compeDocRef.collection('timers');
+    timersCollectionRef.get().asStream().forEach((element) {
+      for (var doc in element.docs) {
+        doc.reference.delete();
+      }
+    });
+    await compeDocRef.delete();
+
+    var newCompes = List<Compe>.from(state.compes ?? []);
     newCompes.removeWhere((compe) => compe.id == compeId);
     state = UserModelState(
       name: state.name,

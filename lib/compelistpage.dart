@@ -11,7 +11,6 @@ class CompeListPage extends ConsumerStatefulWidget {
 
 class _CompeListPageState extends ConsumerState<CompeListPage> {
   final _formKey = GlobalKey<FormState>();
-  int num = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +79,8 @@ class _CompeListPageState extends ConsumerState<CompeListPage> {
         itemBuilder: (context, index) {
           final compe = userModel.compes![index];
           return GestureDetector(
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => StopwatchPage(compe: compe),
@@ -132,83 +131,96 @@ class _CompeListPageState extends ConsumerState<CompeListPage> {
     TextEditingController memoController,
     WidgetRef ref,
   ) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                '新規の測定エリアを追加',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: '測定名',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '測定名を入力してください';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: memoController,
-                decoration: const InputDecoration(
-                  labelText: '備考',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              DropdownButton<int>(
-                value: num,
-                onChanged: (int? newValue) {
-                  setState(() {
-                    num = newValue!;
-                  });
-                },
-                items: List<int>.generate(10, (i) => i + 1)
-                    .map<DropdownMenuItem<int>>((int value) {
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text(value.toString()),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final compe = Compe(
-                      id: '',
-                      name: nameController.text,
-                      memo: memoController.text,
-                      num: num,
-                    );
-                    ref.read(userModelProvider.notifier).addCompe(compe);
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('追加'),
-              ),
-            ],
+    int num = 1;
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-        ),
-      ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '新規の測定エリアを追加',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: '測定名',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '測定名を入力してください';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: memoController,
+                    decoration: const InputDecoration(
+                      labelText: '備考',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: '測定数',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: num,
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            num = newValue!;
+                          });
+                        },
+                        items: List<int>.generate(10, (i) => i + 1)
+                            .map<DropdownMenuItem<int>>((int value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(value.toString()),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        final compe = Compe(
+                          id: '',
+                          name: nameController.text,
+                          memo: memoController.text,
+                          num: num,
+                        );
+                        ref.read(userModelProvider.notifier).addCompe(compe);
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('追加'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

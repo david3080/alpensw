@@ -57,7 +57,7 @@ class StopwatchModel {
 
     if (docSnapshot.exists) {
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-      if (data.containsKey('startDateTime')) {
+      if (data.containsKey('startDateTime') && data['startDateTime'] != null) {
         startDateTime = (data['startDateTime'] as Timestamp).toDate();
         if (timerType == TimerType.running) {
           _stopwatch.startFrom(startDateTime!);
