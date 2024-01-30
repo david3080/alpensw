@@ -83,9 +83,15 @@ class StopwatchPage extends ConsumerWidget {
             if (_shouldShowStopwatch(
                 stopwatchController.timerType, timerType)) {
               return ListTile(
-                contentPadding: const EdgeInsets.all(3.0),
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 5.0,
+                  vertical: 0.0,
+                ),
                 leading: Container(
-                  height: 30.0,
+                  width: 20.0,
+                  height: 20.0,
+                  alignment: Alignment.centerRight,
                   child: Text(
                     stopwatchController.getBibNumber().toString(),
                     style: const TextStyle(
@@ -99,17 +105,14 @@ class StopwatchPage extends ConsumerWidget {
                   children: <Widget>[
                     Expanded(
                       flex: 4,
-                      child: Container(
-                        height: 20.0,
-                        child: Text(
-                          formatTime(
-                            timerType == TimerType.stopped
-                                ? stopwatchController.getTimerMilliseconds()
-                                : stopwatchController.milliseconds,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 15,
-                          ),
+                      child: Text(
+                        formatTime(
+                          timerType == TimerType.stopped
+                              ? stopwatchController.getTimerMilliseconds()
+                              : stopwatchController.milliseconds,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 15,
                         ),
                       ),
                     ),
@@ -118,24 +121,18 @@ class StopwatchPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          SizedBox(
-                            height: 10.0,
-                            child: Text(
-                              stopwatchController.getFormattedStartDateTime() ??
-                                  "-",
-                              style: const TextStyle(
-                                fontSize: 9,
-                              ),
+                          Text(
+                            stopwatchController.getFormattedStartDateTime() ??
+                                "-",
+                            style: const TextStyle(
+                              fontSize: 12,
                             ),
                           ),
-                          SizedBox(
-                            height: 10.0,
-                            child: Text(
-                              stopwatchController.getFormattedStopDateTime() ??
-                                  "-",
-                              style: const TextStyle(
-                                fontSize: 9,
-                              ),
+                          Text(
+                            stopwatchController.getFormattedStopDateTime() ??
+                                "-",
+                            style: const TextStyle(
+                              fontSize: 12,
                             ),
                           ),
                         ],
