@@ -109,10 +109,10 @@ class _CompeListPageState extends ConsumerState<CompeListPage> {
         onPressed: () {
           final nameCtrl = TextEditingController();
           final memoCtrl = TextEditingController();
+          num.value = 1;
           showDialog(
             context: context,
             builder: (context) {
-              num.value = 1;
               return _buildAddCompeDialog(
                 context,
                 nameCtrl,

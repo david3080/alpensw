@@ -1,17 +1,14 @@
-# alpensw
+# ALPENストップウォッチ
 
-A new Flutter project.
+## 概要
+アルペンスキー用のストップウォッチ。スタート地点とゴール地点が離れていても利用することができ、スタート地点でスタートボタンを押下してタイマーを開始し、ゴール地点でストップボタンを押下することが可能です。ミリ秒単位の開始時刻と停止時刻はクラウドデータベース（Firestore）を経由して同期されますので、離れた地点でスタート・ストップボタンが押下されても正確に時刻を測ることができます。また、複数人のタイムを同時に測定を行うことにも対応しています。
 
-## Getting Started
+## 開発の経緯
+アルペンスキーのストップウォッチはオリンピックで利用される超高額なセイコーのタイムウォッチから[安価なもの](https://www.sportsunity.com/corporation/estore/browerRL.html)でも54万円と高額です。そのため、資金力がない協会では購入することができず、競技場や機器の調達で苦労している状況がありました。一方、昨今IoTやDXがさけばれる中、DIYで安価に測定のためのIoT機器とそれを制御し、使いやすいUIを提供するソフトウェアの開発が比較的容易にできるようになってきているため、岐阜県のソフトピアジャパンに入居する株式会社リーサがプロトタイプの開発をボランティアで受け持つこととなった。
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# alpensw
+# 今後の拡張予定
+- タイム計測の結果をGoogleスプレッドシートへ出力し情報を共有する
+- 光電管タイム計測器への対応
+    - 同じ岐阜県大垣市リクラウド社の[制作代行](https://ricloud.session.jp/company/)を依頼
+    - 本アプリを光電管タイム測定気のラズパイ上のLinuxに移植
+    - センサーネットワークは[MONOワイアレス](https://mono-wireless.com/jp/products/TWE-LITE/index.html)がおすすめ

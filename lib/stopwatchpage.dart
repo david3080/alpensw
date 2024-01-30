@@ -83,11 +83,15 @@ class StopwatchPage extends ConsumerWidget {
             if (_shouldShowStopwatch(
                 stopwatchController.timerType, timerType)) {
               return ListTile(
-                leading: Text(
-                  stopwatchController.getBibNumber().toString(),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                contentPadding: const EdgeInsets.all(3.0),
+                leading: Container(
+                  height: 30.0,
+                  child: Text(
+                    stopwatchController.getBibNumber().toString(),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 title: Row(
@@ -95,14 +99,17 @@ class StopwatchPage extends ConsumerWidget {
                   children: <Widget>[
                     Expanded(
                       flex: 4,
-                      child: Text(
-                        formatTime(
-                          timerType == TimerType.stopped
-                              ? stopwatchController.getTimerMilliseconds()
-                              : stopwatchController.milliseconds,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                      child: Container(
+                        height: 20.0,
+                        child: Text(
+                          formatTime(
+                            timerType == TimerType.stopped
+                                ? stopwatchController.getTimerMilliseconds()
+                                : stopwatchController.milliseconds,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ),
@@ -111,18 +118,24 @@ class StopwatchPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
-                          Text(
-                            stopwatchController.getFormattedStartDateTime() ??
-                                "-",
-                            style: const TextStyle(
-                              fontSize: 9,
+                          SizedBox(
+                            height: 10.0,
+                            child: Text(
+                              stopwatchController.getFormattedStartDateTime() ??
+                                  "-",
+                              style: const TextStyle(
+                                fontSize: 9,
+                              ),
                             ),
                           ),
-                          Text(
-                            stopwatchController.getFormattedStopDateTime() ??
-                                "-",
-                            style: const TextStyle(
-                              fontSize: 9,
+                          SizedBox(
+                            height: 10.0,
+                            child: Text(
+                              stopwatchController.getFormattedStopDateTime() ??
+                                  "-",
+                              style: const TextStyle(
+                                fontSize: 9,
+                              ),
                             ),
                           ),
                         ],
@@ -141,15 +154,15 @@ class StopwatchPage extends ConsumerWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.play_arrow),
-            label: 'Start',
+            label: 'スタート地点',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.stop),
-            label: 'Goal',
+            label: 'ゴール地点',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.flag),
-            label: 'Results',
+            label: '結果',
           ),
         ],
         currentIndex: TimerType.values.indexOf(timerType),
