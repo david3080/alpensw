@@ -8,10 +8,10 @@ import 'compelistpage.dart';
 import 'firebaseholder.dart';
 import 'usermodel.dart';
 import 'loginpage.dart';
-import 'package:flutter/rendering.dart';
+//import 'package:flutter/rendering.dart';
 
 void main() async {
-  debugPaintSizeEnabled = true;
+//  debugPaintSizeEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(

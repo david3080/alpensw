@@ -32,12 +32,16 @@ class StopwatchPage extends ConsumerWidget {
       stopwatchList.stopwatches[i].syncWithFirestore();
     }
 
+    var title = timerType.index == 0
+        ? "スタート地点"
+        : (timerType.index == 1 ? "ゴール地点" : "結果");
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "測定名: ${compe.name}",
+          "測定名「${compe.name}」の$title",
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
