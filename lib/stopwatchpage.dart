@@ -125,14 +125,14 @@ class StopwatchPage extends ConsumerWidget {
                             stopwatchController.getFormattedStartDateTime() ??
                                 "-",
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                           Text(
                             stopwatchController.getFormattedStopDateTime() ??
                                 "-",
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                         ],
