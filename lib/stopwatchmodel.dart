@@ -11,17 +11,18 @@ class StopwatchModel {
   int bibNumber;
   UserModelState user;
   Compe compe;
+  VoidCallback onTick;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   MyStopwatch get stopwatch => _stopwatch;
   FirebaseFirestore get firestore => _firestore;
 
-  StopwatchModel(this.bibNumber, this.user, this.compe, VoidCallback onTick)
+  StopwatchModel(this.bibNumber, this.user, this.compe, this.onTick)
       : _stopwatch = MyStopwatch(onTick: onTick);
 
   TimerType get timerType {
-    if (startDateTime == null) {
+    if (startDateTime == null && stopDateTime == null) {
       return TimerType.initial;
     } else if (stopDateTime == null) {
       return TimerType.running;
@@ -64,6 +65,12 @@ class StopwatchModel {
         }
       }
     }
+
+    if (startDateTime == null) {
+      _stopwatch.reset();
+    }
+
+    onTick();
   }
 
   void startTimer() {
@@ -78,14 +85,15 @@ class StopwatchModel {
     setDateTimeOnFirestore();
   }
 
-  void resetTimer() {
-    if (timerType == TimerType.running) {
-      _stopwatch.stop();
-    }
-    _stopwatch.reset();
+  void resetTimer() async {
+    // 先にFirestoreを更新
     startDateTime = null;
     stopDateTime = null;
-    setDateTimeOnFirestore();
+    await setDateTimeOnFirestore();
+    // 自らのタイマーをリセット
+    _stopwatch.reset();
+    // コールバックを実行
+    onTick();
   }
 
   int get milliseconds => _stopwatch.elapsedMilliseconds;

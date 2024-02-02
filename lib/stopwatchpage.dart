@@ -25,11 +25,13 @@ class StopwatchPage extends ConsumerWidget {
     final stopwatchList = ref.watch(stopwatchListProvider(compe).notifier);
     final timerType = ref.watch(naviProvider);
 
-    // Firestoreにcompe.num分のtimersコレクションが存在しない場合のみ作成
+    // Firestoreとデータ同期を行い
+    // compe下にtimersコレクションが存在しない場合のみ新規作成
     for (int i = 0; i < compe.num; i++) {
-      stopwatchList.checkAndSyncTimerWithFirestore(i);
-      // Firestoreとの同期を行う
-      stopwatchList.stopwatches[i].syncWithFirestore();
+      ref
+          .watch(stopwatchListProvider(compe).notifier)
+          .stopwatches[i]
+          .syncWithFirestore();
     }
 
     var title = timerType.index == 0
@@ -73,17 +75,24 @@ class StopwatchPage extends ConsumerWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              for (int i = 0; i < stopwatchList.stopwatches.length; i++) {
-                stopwatchList.resetTimer(i);
+              for (int i = 0;
+                  i <
+                      ref
+                          .watch(stopwatchListProvider(compe))
+                          .stopwatches
+                          .length;
+                  i++) {
+                ref.watch(stopwatchListProvider(compe).notifier).resetTimer(i);
               }
             },
           ),
         ],
       ),
       body: ListView.builder(
-          itemCount: stopwatchList.stopwatches.length,
+          itemCount: ref.watch(stopwatchListProvider(compe)).stopwatches.length,
           itemBuilder: (context, index) {
-            final stopwatchController = stopwatchList.stopwatches[index];
+            final stopwatchController =
+                ref.watch(stopwatchListProvider(compe)).stopwatches[index];
             if (_shouldShowStopwatch(
                 stopwatchController.timerType, timerType)) {
               return ListTile(
@@ -144,8 +153,8 @@ class StopwatchPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                trailing: _buildTrailingIcon(
-                    stopwatchController.timerType, index, stopwatchList),
+                trailing: _buildTrailingIcon(stopwatchController.timerType,
+                    index, ref.watch(stopwatchListProvider(compe).notifier)),
               );
             } else {
               return const SizedBox.shrink();

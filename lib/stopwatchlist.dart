@@ -89,22 +89,6 @@ class StopwatcheListNotifier extends StateNotifier<StopwatcheList> {
       }
     });
   }
-
-  Future<void> checkAndSyncTimerWithFirestore(int index) async {
-    final stopwatch = state.stopwatches[index];
-    final docRef = stopwatch.firestore
-        .collection('users')
-        .doc(user.email)
-        .collection('compes')
-        .doc(compe.id)
-        .collection('timers')
-        .doc(stopwatch.bibNumber.toString());
-
-    final docSnapshot = await docRef.get();
-    if (!docSnapshot.exists) {
-      syncTimerWithFirestore(index);
-    }
-  }
 }
 
 class StopwatcheList {

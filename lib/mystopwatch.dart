@@ -10,8 +10,6 @@ class MyStopwatch {
 
   MyStopwatch({this.onTick});
 
-  bool get isRunning => _start != null;
-
   int get elapsedMilliseconds => _elapsed.inMilliseconds;
 
   set elapsedMilliseconds(int milliseconds) {
