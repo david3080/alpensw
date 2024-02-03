@@ -1,28 +1,24 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'usermodel.dart';
-import 'mystopwatch.dart';
 
 class StopwatchModel {
-  final MyStopwatch _stopwatch;
+  int bibNumber;
+  DateTime? _start;
+  Timer? _timer;
+  Duration _elapsed = Duration.zero;
+
   DateTime? startDateTime;
   DateTime? stopDateTime;
-  int bibNumber;
+
   UserModelState user;
   Compe compe;
   VoidCallback onTick;
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  MyStopwatch get stopwatch => _stopwatch;
-  FirebaseFirestore get firestore => _firestore;
-
-  StopwatchModel(this.bibNumber, this.user, this.compe, this.onTick)
-      : _stopwatch = MyStopwatch(onTick: onTick);
+  StopwatchModel(this.bibNumber, this.user, this.compe, this.onTick);
 
   TimerType get timerType {
-    if (startDateTime == null && stopDateTime == null) {
+    if (startDateTime == null) {
       return TimerType.initial;
     } else if (stopDateTime == null) {
       return TimerType.running;
@@ -31,103 +27,75 @@ class StopwatchModel {
     }
   }
 
-  // Firestore上のタイマーをセットする
-  Future<void> setDateTimeOnFirestore() async {
-    await _firestore
-        .collection('users')
-        .doc(user.email)
-        .collection('compes')
-        .doc(compe.id)
-        .collection('timers')
-        .doc(bibNumber.toString())
-        .set({
-      'startDateTime': startDateTime,
-      'stopDateTime': stopDateTime,
-    }, SetOptions(merge: true));
-  }
-
-  Future<void> syncWithFirestore() async {
-    DocumentSnapshot docSnapshot = await _firestore
-        .collection('users')
-        .doc(user.email)
-        .collection('compes')
-        .doc(compe.id)
-        .collection('timers')
-        .doc(bibNumber.toString())
-        .get();
-
-    if (docSnapshot.exists) {
-      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-      if (data.containsKey('startDateTime') && data['startDateTime'] != null) {
-        startDateTime = (data['startDateTime'] as Timestamp).toDate();
-        if (timerType == TimerType.running) {
-          _stopwatch.startFrom(startDateTime!);
-        }
-      }
-    }
-
-    if (startDateTime == null) {
-      _stopwatch.reset();
-    }
-
-    onTick();
-  }
-
   void startTimer() {
-    _stopwatch.start();
-    startDateTime = DateTime.now();
-    setDateTimeOnFirestore();
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 100),
+      (Timer t) => _tick(),
+    );
+    _start = DateTime.now();
+    startDateTime = _start;
+    onTick.call();
   }
 
   void stopTimer() {
-    _stopwatch.stop();
+    _start = null;
+    _timer?.cancel();
     stopDateTime = DateTime.now();
-    setDateTimeOnFirestore();
+    onTick.call();
   }
 
   void resetTimer() async {
-    // 先にFirestoreを更新
+    _start = null;
+    _elapsed = Duration.zero;
     startDateTime = null;
     stopDateTime = null;
-    await setDateTimeOnFirestore();
-    // 自らのタイマーをリセット
-    _stopwatch.reset();
-    // コールバックを実行
-    onTick();
+    onTick.call();
   }
 
-  int get milliseconds => _stopwatch.elapsedMilliseconds;
+  void startFrom(DateTime startDateTime) {
+    _start = startDateTime;
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 100),
+      (Timer t) => _tick(),
+    );
+  }
 
-  int getTimerMilliseconds() {
-    if (startDateTime != null && stopDateTime != null) {
-      return stopDateTime!.difference(startDateTime!).inMilliseconds;
+  void _tick() {
+    if (_start != null) {
+      _elapsed = DateTime.now().difference(_start!);
+      onTick.call();
     }
-    return 0;
   }
 
-  String? getFormattedStartDateTime() {
-    if (startDateTime != null) {
-      return _formatDateTime(startDateTime!);
+  String get milliseconds => _formatTime(_elapsed.inMilliseconds);
+  String get resultMilliseconds =>
+      _formatTime(stopDateTime!.difference(startDateTime!).inMilliseconds);
+
+  String get formattedStartDateTime => _formatDateTime(startDateTime);
+  String get formattedStopDateTime => _formatDateTime(stopDateTime);
+
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) {
+      return "-";
+    } else {
+      return "${dateTime.hour.toString().padLeft(2, '0')}:"
+          "${dateTime.minute.toString().padLeft(2, '0')}:"
+          "${dateTime.second.toString().padLeft(2, '0')}."
+          "${dateTime.millisecond.toString().padLeft(3, '0')}";
     }
-    return null;
   }
 
-  String? getFormattedStopDateTime() {
-    if (stopDateTime != null) {
-      return _formatDateTime(stopDateTime!);
-    }
-    return null;
-  }
+  String _formatTime(int milliseconds) {
+    final int hundreds = (milliseconds / 10).floor();
+    final int seconds = (hundreds / 100).floor();
+    final int minutes = (seconds / 60).floor();
 
-  String _formatDateTime(DateTime dateTime) {
-    return "${dateTime.hour.toString().padLeft(2, '0')}:"
-        "${dateTime.minute.toString().padLeft(2, '0')}:"
-        "${dateTime.second.toString().padLeft(2, '0')}."
-        "${dateTime.millisecond.toString().padLeft(3, '0')}";
-  }
+    final String formattedMinutes = minutes.toString().padLeft(2, '0');
+    final String formattedSeconds = (seconds % 60).toString().padLeft(2, '0');
+    final String formattedMilliseconds =
+        (milliseconds % 1000).toString().padLeft(3, '0');
 
-  int getBibNumber() {
-    return bibNumber;
+    return "$formattedMinutes:$formattedSeconds:$formattedMilliseconds";
   }
 }
 

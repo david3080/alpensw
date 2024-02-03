@@ -22,17 +22,10 @@ class StopwatchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stopwatchList = ref.watch(stopwatchListProvider(compe).notifier);
     final timerType = ref.watch(naviProvider);
 
-    // Firestoreとデータ同期を行い
-    // compe下にtimersコレクションが存在しない場合のみ新規作成
-    for (int i = 0; i < compe.num; i++) {
-      ref
-          .watch(stopwatchListProvider(compe).notifier)
-          .stopwatches[i]
-          .syncWithFirestore();
-    }
+    // Firestoreとデータ同期
+    ref.watch(stopwatchListProvider(compe).notifier).syncTimerWithFirestore();
 
     var title = timerType.index == 0
         ? "スタート地点"
@@ -75,15 +68,7 @@ class StopwatchPage extends ConsumerWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              for (int i = 0;
-                  i <
-                      ref
-                          .watch(stopwatchListProvider(compe))
-                          .stopwatches
-                          .length;
-                  i++) {
-                ref.watch(stopwatchListProvider(compe).notifier).resetTimer(i);
-              }
+              ref.watch(stopwatchListProvider(compe).notifier).resetTimer();
             },
           ),
         ],
@@ -93,8 +78,7 @@ class StopwatchPage extends ConsumerWidget {
           itemBuilder: (context, index) {
             final stopwatchController =
                 ref.watch(stopwatchListProvider(compe)).stopwatches[index];
-            if (_shouldShowStopwatch(
-                stopwatchController.timerType, timerType)) {
+            if (stopwatchController.timerType == timerType) {
               return ListTile(
                 dense: true,
                 contentPadding: const EdgeInsets.symmetric(
@@ -106,7 +90,7 @@ class StopwatchPage extends ConsumerWidget {
                   height: 20.0,
                   alignment: Alignment.centerRight,
                   child: Text(
-                    stopwatchController.getBibNumber().toString(),
+                    stopwatchController.bibNumber.toString(),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -119,11 +103,9 @@ class StopwatchPage extends ConsumerWidget {
                     Expanded(
                       flex: 4,
                       child: Text(
-                        formatTime(
-                          timerType == TimerType.stopped
-                              ? stopwatchController.getTimerMilliseconds()
-                              : stopwatchController.milliseconds,
-                        ),
+                        timerType == TimerType.stopped
+                            ? stopwatchController.resultMilliseconds
+                            : stopwatchController.milliseconds,
                         style: const TextStyle(
                           fontSize: 15,
                         ),
@@ -135,15 +117,13 @@ class StopwatchPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
                           Text(
-                            stopwatchController.getFormattedStartDateTime() ??
-                                "-",
+                            stopwatchController.formattedStartDateTime,
                             style: const TextStyle(
                               fontSize: 10,
                             ),
                           ),
                           Text(
-                            stopwatchController.getFormattedStopDateTime() ??
-                                "-",
+                            stopwatchController.formattedStopDateTime,
                             style: const TextStyle(
                               fontSize: 10,
                             ),
@@ -181,32 +161,6 @@ class StopwatchPage extends ConsumerWidget {
         },
       ),
     );
-  }
-
-  String formatTime(int milliseconds) {
-    final int hundreds = (milliseconds / 10).floor();
-    final int seconds = (hundreds / 100).floor();
-    final int minutes = (seconds / 60).floor();
-
-    final String formattedMinutes = minutes.toString().padLeft(2, '0');
-    final String formattedSeconds = (seconds % 60).toString().padLeft(2, '0');
-    final String formattedMilliseconds =
-        (milliseconds % 1000).toString().padLeft(3, '0');
-
-    return "$formattedMinutes:$formattedSeconds:$formattedMilliseconds";
-  }
-
-  bool _shouldShowStopwatch(TimerType stopwatchType, TimerType currentType) {
-    switch (currentType) {
-      case TimerType.initial:
-        return stopwatchType == TimerType.initial;
-      case TimerType.running:
-        return stopwatchType == TimerType.running;
-      case TimerType.stopped:
-        return stopwatchType == TimerType.stopped;
-      default:
-        return false;
-    }
   }
 
   Widget? _buildTrailingIcon(TimerType stopwatchType, int index,
